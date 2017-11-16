@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Book Search App</string>
+    <string name="keyword">Keyword...</string>
+    <string name="btn_search">Search</string>
+    <string name="book_title">Beginning Android Programming with Android Studio</string>
+    <string name="book_authors">Jerome F. DiMarzio</string>
+    <string name="no_authors">No Authors</string>
+    <string name="book_description">A hands-on introduction to the latest release of the Android OS and the easiest Android tools for developers As the dominant mobile platform today, the Android OS is a powerful and flexible platform for mobile device.</string>
+    <string name="no_description">No Description</string>
+    <string name="result_not_found">No results found.</string>
+    <string name="enter_search_keyword">Please enter keywords to search for books.</string>
+    <string name="error_no_internet">No internet connection available</string>
+</resources>
