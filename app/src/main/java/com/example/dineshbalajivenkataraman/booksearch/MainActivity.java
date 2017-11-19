@@ -1,4 +1,5 @@
 package com.example.dineshbalajivenkataraman.booksearch;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -16,9 +17,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,9 +31,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
+    ArrayList<Book> books = new ArrayList<Book>();
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     @BindView(R.id.recycler_view)
@@ -41,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     TextView mInfoTextView;
     @BindView(R.id.edit_text_search)
     EditText mSearchEditText;
+    private final String KEY_RECYCLER_STATE = "recycler_state";
+
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String BOOK_REQUEST_URL ="https://www.googleapis.com/books/v1/volumes?q=";
     @Override
@@ -51,28 +58,53 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        Log.i(LOG_TAG, "I am in On Create State");
         mAdapter = new BookAdapter(new ArrayList<Book>(), new BookAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Book book) {
             }
         });
-        mRecyclerView.setAdapter(mAdapter);
-        mSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isInternetConnectionAvailable()) {
-                    BookAsyncTask task = new BookAsyncTask();
-                    task.execute();
-                } else
-                    Toast.makeText(MainActivity.this, R.string.error_no_internet,
-                            Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (savedInstanceState != null) {
+
+
+            Log.i(LOG_TAG, "Devise is rotated ===============>" );
+            books = savedInstanceState.getParcelableArrayList(KEY_RECYCLER_STATE);
+            Log.i(LOG_TAG, "I am in Onsaved Insatnce and I am carrying Books Object " + books);
+            mAdapter = new BookAdapter(books, new BookAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Book book) {
+                    String url = book.getmBookInfoLink();
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                }
+            });
+            mRecyclerView.setAdapter(mAdapter);
+            mInfoTextView.setVisibility(View.GONE);
+
+        }
+        else
+        {
+            mRecyclerView.setAdapter(mAdapter);
+            mSearchButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isInternetConnectionAvailable()) {
+                        BookAsyncTask task = new BookAsyncTask();
+                        task.execute();
+                    } else
+                        Toast.makeText(MainActivity.this, R.string.error_no_internet,
+                                Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
     private boolean isInternetConnectionAvailable() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork.isConnectedOrConnecting();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        return activeNetwork.isConnected();
     }
     private class BookAsyncTask extends AsyncTask<URL, Void, ArrayList<Book>> {
         private String searchInput = mSearchEditText.getText().toString();
@@ -88,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
             }
             searchInput = searchInput.replace(" ", "+");
             URL url = createUrl(BOOK_REQUEST_URL + searchInput);
-            Log.i(LOG_TAG, "URL is " + url);
+            Log.i(LOG_TAG, "URL is " + url + "Search is " + searchInput);
             String jsonResponse = "";
             try {
                 jsonResponse = makeHttpRequest(url);
@@ -97,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "IOException", e);
             }
             ArrayList<Book> books = extractBookInfoFromJson(jsonResponse);
+
             return books;
         }
         @Override
@@ -179,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
             if (TextUtils.isEmpty(bookJSON)) {
                 return null;
             }
-            ArrayList<Book> books = new ArrayList<Book>();
+          //  ArrayList<Book> books = new ArrayList<Book>();
 
             try {
                 JSONObject baseJsonResponse = new JSONObject(bookJSON);
@@ -206,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                             authorList.add(authorJsonArray.get(j).toString());
                         }
                         authors = authorList.toArray(new String[authorList.size()]);
-                        Log.i(LOG_TAG, "Authors are " + authors[0]);
+
                     }
                     String description = "";
                     if (bookInfo.optString("description") != null)
@@ -221,6 +254,18 @@ public class MainActivity extends AppCompatActivity {
             }
             return books;
         }
+    }
+
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(LOG_TAG, "I am from last - OnsavedInsance " + books);
+       outState.putParcelableArrayList(KEY_RECYCLER_STATE, books);
+
+
+
     }
 }
 
