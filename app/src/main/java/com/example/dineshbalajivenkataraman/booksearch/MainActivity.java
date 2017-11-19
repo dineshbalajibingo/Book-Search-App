@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             Adapter = new BookAdapter(bookList, new BookAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Book book) {
-                    String url = book.getmBookInfoLink();
+                    String url = book.getBookInfoLink();
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(url));
                     startActivity(i);
