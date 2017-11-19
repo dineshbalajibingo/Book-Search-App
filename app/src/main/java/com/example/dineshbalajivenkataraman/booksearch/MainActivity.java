@@ -35,31 +35,42 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
-    ArrayList<Book> books = new ArrayList<Book>();
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    @BindView(R.id.recycler_view)
-    RecyclerView mRecyclerView;
-    @BindView(R.id.btn_search)
-    Button mSearchButton;
-    @BindView(R.id.text_view_information)
-    TextView mInfoTextView;
-    @BindView(R.id.edit_text_search)
-    EditText mSearchEditText;
+    
+    private static final int READ_TIMEOUT = 10000;
+    private static final int CONNECTION_TIMEOUT = 10000;
     private final String KEY_RECYCLER_STATE = "recycler_state";
-
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String BOOK_REQUEST_URL ="https://www.googleapis.com/books/v1/volumes?q=";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_VOLUME_INFO= "volumeInfo";
+    private static final String KEY_AUTHORS = "authors";
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_INFO_LINK = "infoLink";
+
+
+    ArrayList<Book> books = new ArrayList<Book>();
+    private RecyclerView.Adapter Adapter;
+    private RecyclerView.LayoutManager LayoutManager;
+    @BindView(R.id.recycler_view)
+    RecyclerView RecyclerView;
+    @BindView(R.id.btn_search)
+    Button SearchButton;
+    @BindView(R.id.text_view_information)
+    TextView InfoTextView;
+    @BindView(R.id.edit_text_search)
+    EditText SearchEditText;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        RecyclerView.setHasFixedSize(true);
+        LayoutManager = new LinearLayoutManager(this);
+        RecyclerView.setLayoutManager(LayoutManager);
         Log.i(LOG_TAG, "I am in On Create State");
-        mAdapter = new BookAdapter(new ArrayList<Book>(), new BookAdapter.OnItemClickListener() {
+        Adapter = new BookAdapter(new ArrayList<Book>(), new BookAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Book book) {
             }
@@ -70,23 +81,23 @@ public class MainActivity extends AppCompatActivity {
             Log.i(LOG_TAG, "Devise is rotated ===============>" );
             books = savedInstanceState.getParcelableArrayList(KEY_RECYCLER_STATE);
             Log.i(LOG_TAG, "I am in Onsaved Insatnce and I am carrying Books Object " + books);
-            mAdapter = new BookAdapter(books, new BookAdapter.OnItemClickListener() {
+            Adapter = new BookAdapter(books, new BookAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Book book) {
-                    String url = book.getmBookInfoLink();
+                    String url = book.getBookInfoLink();
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(url));
                     startActivity(i);
                 }
             });
-            mRecyclerView.setAdapter(mAdapter);
-            mInfoTextView.setVisibility(View.GONE);
+            RecyclerView.setAdapter(Adapter);
+            InfoTextView.setVisibility(View.GONE);
 
         }
         else
         {
-            mRecyclerView.setAdapter(mAdapter);
-            mSearchButton.setOnClickListener(new View.OnClickListener() {
+            RecyclerView.setAdapter(Adapter);
+            SearchButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (isInternetConnectionAvailable()) {
@@ -107,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         return activeNetwork.isConnected();
     }
     private class BookAsyncTask extends AsyncTask<URL, Void, ArrayList<Book>> {
-        private String searchInput = mSearchEditText.getText().toString();
+        private String searchInput = SearchEditText.getText().toString();
         @Override
         protected ArrayList<Book> doInBackground(URL... urls) {
             if (searchInput.length() == 0) {
@@ -135,16 +146,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Book> bookList) {
             if (bookList == null) {
-                mAdapter = new BookAdapter(new ArrayList<Book>(), new BookAdapter.OnItemClickListener() {
+                Adapter = new BookAdapter(new ArrayList<Book>(), new BookAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(Book book) {
                     }
                 });
-                mRecyclerView.setAdapter(mAdapter);
-                mInfoTextView.setVisibility(View.VISIBLE);
+                RecyclerView.setAdapter(Adapter);
+                InfoTextView.setVisibility(View.VISIBLE);
                 return;
             }
-            mAdapter = new BookAdapter(bookList, new BookAdapter.OnItemClickListener() {
+            Adapter = new BookAdapter(bookList, new BookAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Book book) {
                     String url = book.getmBookInfoLink();
@@ -153,8 +164,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(i);
                 }
             });
-            mRecyclerView.setAdapter(mAdapter);
-            mInfoTextView.setVisibility(View.GONE);
+            RecyclerView.setAdapter(Adapter);
+            InfoTextView.setVisibility(View.GONE);
         }
         private URL createUrl(String stringUrl) {
             URL url = null;
@@ -173,8 +184,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setReadTimeout(10000 /* milliseconds */);
-                urlConnection.setConnectTimeout(15000 /* milliseconds */);
+                urlConnection.setReadTimeout(READ_TIMEOUT /* milliseconds */);
+                urlConnection.setConnectTimeout(CONNECTION_TIMEOUT /* milliseconds */);
                 urlConnection.connect();
                 if (urlConnection.getResponseCode() == 200) {
                     inputStream = urlConnection.getInputStream();
@@ -225,14 +236,14 @@ public class MainActivity extends AppCompatActivity {
 
                     return null;
                 }
-                JSONArray itemArray = baseJsonResponse.getJSONArray("items");
+                JSONArray itemArray = baseJsonResponse.getJSONArray(KEY_TITLE);
                 for (int i = 0; i < itemArray.length(); i++) {
                     JSONObject cuurentItem = itemArray.getJSONObject(i);
-                    JSONObject bookInfo = cuurentItem.getJSONObject("volumeInfo");
-                    String title = bookInfo.getString("title");
+                    JSONObject bookInfo = cuurentItem.getJSONObject(KEY_VOLUME_INFO);
+                    String title = bookInfo.getString(KEY_TITLE);
 
                     String[] authors = new String[]{};
-                    JSONArray authorJsonArray = bookInfo.optJSONArray("authors");
+                    JSONArray authorJsonArray = bookInfo.optJSONArray(KEY_AUTHORS);
                     if (authorJsonArray != null) {
                         ArrayList<String> authorList = new ArrayList<String>();
                         for (int j = 0; j < authorJsonArray.length(); j++) {
@@ -242,11 +253,11 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                     String description = "";
-                    if (bookInfo.optString("description") != null)
-                        description = bookInfo.optString("description");
+                    if (bookInfo.optString(KEY_DESCRIPTION) != null)
+                        description = bookInfo.optString(KEY_DESCRIPTION);
                     String infoLink = "";
-                    if (bookInfo.optString("infoLink") != null)
-                        infoLink = bookInfo.optString("infoLink");
+                    if (bookInfo.optString(KEY_INFO_LINK) != null)
+                        infoLink = bookInfo.optString(KEY_INFO_LINK);
                     books.add(new Book(title, authors, description, infoLink));
                 }
             } catch (JSONException e) {

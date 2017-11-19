@@ -9,14 +9,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
-    private final List<Book> mBooks;
-    private final OnItemClickListener mListener;
+    private final List<Book> Books;
+    private final OnItemClickListener Listener;
     public interface OnItemClickListener {
         void onItemClick(Book book);
     }
     public BookAdapter(List<Book> books, OnItemClickListener listener) {
-        mBooks = books;
-        mListener = listener;
+        Books = books;
+        Listener = listener;
     }
     @Override
     public BookViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -27,23 +27,23 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     }
     @Override
     public void onBindViewHolder(BookViewHolder holder, int position) {
-        Book book = mBooks.get(position);
-        holder.mBookTitle.setText(book.getmBookTitle());
-        holder.mBookAuthors.setText(book.authorsName());
-        holder.mBookDescription.setText(book.getmBookDescription());
-        holder.bind(mBooks.get(position), mListener);
+        Book book = Books.get(position);
+        holder.BookTitle.setText(book.getBookTitle());
+        holder.BookAuthors.setText(book.authorsName());
+        holder.BookDescription.setText(book.getBookDescription());
+        holder.bind(Books.get(position), Listener);
     }
     @Override
     public int getItemCount() {
-        return mBooks.size();
+        return Books.size();
     }
     public static class BookViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.book_title)
-        TextView mBookTitle;
+        TextView BookTitle;
         @BindView(R.id.book_authors)
-        TextView mBookAuthors;
+        TextView BookAuthors;
         @BindView(R.id.book_description)
-        TextView mBookDescription;
+        TextView BookDescription;
         public BookViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);

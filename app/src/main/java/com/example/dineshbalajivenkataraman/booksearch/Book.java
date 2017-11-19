@@ -7,43 +7,43 @@ import java.util.Arrays;
 
 public class Book implements Parcelable{
     protected Book(Parcel in) {
-        mBookTitle = in.readString();
-        mBookAuthors = in.createStringArray();
-        mBookDescription = in.readString();
-        mBookInfoLink = in.readString();
+        BookTitle = in.readString();
+        BookAuthors = in.createStringArray();
+        BookDescription = in.readString();
+        BookInfoLink = in.readString();
     }
 
 
-    private String mBookTitle;
-    private String[] mBookAuthors;
-    private String mBookDescription;
-    private String mBookInfoLink;
+    private String BookTitle;
+    private String[] BookAuthors;
+    private String BookDescription;
+    private String BookInfoLink;
 
-    public Book(String mBookTitle, String[] mBookAuthors, String mBookDescription, String mBookInfoLink) {
-        this.mBookTitle = mBookTitle;
-        this.mBookAuthors = mBookAuthors;
-        this.mBookDescription = mBookDescription;
-        this.mBookInfoLink = mBookInfoLink;
+    public Book(String BookTitle, String[] BookAuthors, String BookDescription, String BookInfoLink) {
+        this.BookTitle = BookTitle;
+        this.BookAuthors = BookAuthors;
+        this.BookDescription = BookDescription;
+        this.BookInfoLink = BookInfoLink;
     }
-    public String getmBookTitle() {
-        return mBookTitle;
+    public String getBookTitle() {
+        return BookTitle;
     }
-    public String[] getmBookAuthors() {
-        return mBookAuthors;
+    public String[] getBookAuthors() {
+        return BookAuthors;
     }
-    public String getmBookDescription() {
-        return mBookDescription;
+    public String getBookDescription() {
+        return BookDescription;
     }
-    public String getmBookInfoLink() {
-        return mBookInfoLink;
+    public String getBookInfoLink() {
+        return BookInfoLink;
     }
     public String authorsName() {
         String authors = "";
-        for (int i = 0; i < mBookAuthors.length; i++) {
-            if (i == mBookAuthors.length - 1) {
-                authors += mBookAuthors[i];
+        for (int i = 0; i < BookAuthors.length; i++) {
+            if (i == BookAuthors.length - 1) {
+                authors += BookAuthors[i];
             } else
-                authors += mBookAuthors[i] + " , ";
+                authors += BookAuthors[i] + " , ";
         }
         return authors;
     }
@@ -55,10 +55,10 @@ public class Book implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(mBookTitle);
-        parcel.writeString(mBookDescription);
-        parcel.writeString(mBookInfoLink);
-        parcel.writeStringArray(mBookAuthors);
+        parcel.writeString(BookTitle);
+        parcel.writeString(BookDescription);
+        parcel.writeString(BookInfoLink);
+        parcel.writeStringArray(BookAuthors);
     }
 
     public static final Creator<Book> CREATOR = new Creator<Book>() {
@@ -76,10 +76,10 @@ public class Book implements Parcelable{
     @Override
     public String toString() {
         return "Book{" +
-                "mBookTitle='" + mBookTitle + '\'' +
-                ", mBookAuthors=" + Arrays.toString(mBookAuthors) +
-                ", mBookDescription='" + mBookDescription + '\'' +
-                ", mBookInfoLink='" + mBookInfoLink + '\'' +
+                "BookTitle='" + BookTitle + '\'' +
+                ", BookAuthors=" + Arrays.toString(BookAuthors) +
+                ", BookDescription='" + BookDescription + '\'' +
+                ", BookInfoLink='" + BookInfoLink + '\'' +
                 '}';
     }
 }
