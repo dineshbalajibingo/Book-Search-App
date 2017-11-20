@@ -1,24 +1,29 @@
 package com.example.dineshbalajivenkataraman.booksearch;
-
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import java.util.Arrays;
-
 public class Book implements Parcelable{
+    public static final Creator<Book> CREATOR = new Creator<Book>() {
+        @Override
+        public Book createFromParcel(Parcel in) {
+            return new Book(in);
+        }
+
+        @Override
+        public Book[] newArray(int size) {
+            return new Book[size];
+        }
+    };
+    private String BookTitle;
+    private String[] BookAuthors;
+    private String BookDescription;
+    private String BookInfoLink;
     protected Book(Parcel in) {
         BookTitle = in.readString();
         BookAuthors = in.createStringArray();
         BookDescription = in.readString();
         BookInfoLink = in.readString();
     }
-
-
-    private String BookTitle;
-    private String[] BookAuthors;
-    private String BookDescription;
-    private String BookInfoLink;
-
     public Book(String BookTitle, String[] BookAuthors, String BookDescription, String BookInfoLink) {
         this.BookTitle = BookTitle;
         this.BookAuthors = BookAuthors;
@@ -47,12 +52,10 @@ public class Book implements Parcelable{
         }
         return authors;
     }
-
     @Override
     public int describeContents() {
         return 0;
     }
-
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(BookTitle);
@@ -60,19 +63,6 @@ public class Book implements Parcelable{
         parcel.writeString(BookInfoLink);
         parcel.writeStringArray(BookAuthors);
     }
-
-    public static final Creator<Book> CREATOR = new Creator<Book>() {
-        @Override
-        public Book createFromParcel(Parcel in) {
-            return new Book(in);
-        }
-
-        @Override
-        public Book[] newArray(int size) {
-            return new Book[size];
-        }
-    };
-
     @Override
     public String toString() {
         return "Book{" +

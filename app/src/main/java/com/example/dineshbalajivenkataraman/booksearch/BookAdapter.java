@@ -11,9 +11,6 @@ import butterknife.ButterKnife;
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
     private final List<Book> Books;
     private final OnItemClickListener Listener;
-    public interface OnItemClickListener {
-        void onItemClick(Book book);
-    }
     public BookAdapter(List<Book> books, OnItemClickListener listener) {
         Books = books;
         Listener = listener;
@@ -36,6 +33,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     @Override
     public int getItemCount() {
         return Books.size();
+    }
+    public interface OnItemClickListener {
+        void onItemClick(Book book);
     }
     public static class BookViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.book_title)
